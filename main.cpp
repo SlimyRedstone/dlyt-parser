@@ -12,9 +12,9 @@
 using namespace std;
 
 #define DL_FINAL_NAME \
-  "-o \"%USERPROFILE%/Desktop/%(uploader)s - %(title)s.%(ext)s\""
+  "-o \"%USERPROFILE%/Desktop/%(uploader|Unknown)s - %(title)s (%(webpage_url)s).%(ext)s\""
 #define DL_FINAL_NAME_TO_DIR \
-  "-o \"%USERPROFILE%/Desktop/%(uploader)s/%(uploader)s - %(title)s.%(ext)s\""
+  "-o \"%USERPROFILE%/Desktop/%(uploader|YTDLP)s/%(uploader|Unknown)s - %(title)s.%(ext)s\""
 #define CMD_START "start \"Youtube DL\" /D \"%USERPROFILE%\" /MIN"
 #define SPONSOR_BLOCK_FILTERS                                               \
   string(                                                                   \
@@ -143,14 +143,14 @@ int main(int _n_args, char *_list_args[]) {
       switch (_option) {
         case 'l': {
           // printf("Downloading url -> %s [%c]\n", current_opt_value, (const char)(_option));
-          printf("Downloading url -> %s [%c]\n", optarg, (const char)(_option));
+          printf("Downloading url -> %s\n", optarg);
           // download_url = current_opt_value;
           download_url = optarg;
           break;
         }
         case 'm': {
           // printf("Downloading as -> %s [%c]\n", current_opt_value, (const char)(_option));
-          printf("Downloading as -> %s [%c]\n", optarg, (const char)(_option));
+          printf("Downloading as -> %s\n", optarg);
           // download_type = current_opt_value[0];
           download_type = optarg[0];
           break;
@@ -166,7 +166,7 @@ int main(int _n_args, char *_list_args[]) {
           "Download link as: \n"
           " y -> High quality Youtube Video\n"
           " m -> Music\n"
-          " v -> Video\n"
+          " v -> Video (Default)\n"
           " x -> Same as y, but extract to channel folder\n");
       // getline(cin, input);
       download_type = getchar();
@@ -184,6 +184,9 @@ int main(int _n_args, char *_list_args[]) {
         success_dl_file = true;
         break;
       }
+      case ' ':
+      case '\n':
+      case '\r':
       case 'v': {
         printf("Downloading as Video\n");
         dlVideo(download_url, FILTER_V);
