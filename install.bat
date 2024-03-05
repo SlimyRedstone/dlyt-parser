@@ -20,4 +20,5 @@ ren main.exe youtube_downloader.exe
 @REM "URL Protocol"=""
 @REM @="URL:dlyt Protocol"
 
-pause
+@REM pause
+@REM exit
