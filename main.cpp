@@ -39,7 +39,7 @@ using namespace std;
 			"-x --audio-quality 0 --audio-format opus --no-part --no-playlist ")  
 #define FILTER_SOUNDCLOUD                                                         \
 	string(                                                                \
-			"-x --audio-quality 0 --audio-format opus --no-part --add-header Authorization:\"OAuth 2-294011-149518749-VPDXuuSqNLfUvz\" " \
+			"-x --audio-quality 0 --audio-format opus --no-part " \
 			"--write-thumbnail --embed-thumbnail ")                            \
 			+ string(DL_FINAL_NAME)
 #define FILTER_V string("--no-playlist ") + string(DL_FINAL_NAME_WITH_SRC)
