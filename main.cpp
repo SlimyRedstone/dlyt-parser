@@ -42,7 +42,7 @@ using namespace std;
 			"-x --audio-quality 0 --audio-format opus --no-part " \
 			"--write-thumbnail --embed-thumbnail ")                            \
 			+ string(DL_FINAL_NAME)
-#define FILTER_V string("--no-playlist ") + string(DL_FINAL_NAME_WITH_SRC)
+#define FILTER_V string("--no-playlist --extractor-args \"generic:impersonate\" ") + string(DL_FINAL_NAME_WITH_SRC)
 
 // #define DEBUG true
 // #define RUN_AS_SEPARATE_PROCESS
@@ -93,16 +93,17 @@ void logText(string path, string text) {
 	fclose(log);
 }
 
-void dlVideo(string video_url, string filter) {
+void dlVideo(string video_url, string filter, bool use_cookies = false) {
 	video_url	 = getRealURL(video_url);
-	string cmd = "%USERPROFILE%\\yt-dlp.exe";
+	string cmd = "cd %USERPROFILE%\\Desktop && %USERPROFILE%\\yt-dlp.exe";
 	cmd += " -r 500M -R 3 --windows-filenames";
 	cmd += " --progress --console-title --progress-template "
         "\"download-title:%(progress._percent_str)s -> %(info.uploader)s - "
         "%(info.title)s [%(info.id)s]\" ";
 
 	cmd += filter;
-
+	
+	if (use_cookies) cmd += " --cookies \"%USERPROFILE%/Downloads/cookies.txt\"";
 	// cmd = cmd + " --exec after_move:\"echo •\"";
 	cmd += " " + SPONSOR_BLOCK_FILTERS + " " + video_url;
 
@@ -122,6 +123,7 @@ int main(int _n_args, char *_list_args[]) {
 	uint16_t n_loop = 0;
 	string download_url;
 	char download_type	 = 'y';
+	char use_cookies = 'n';
 	char options_list[2] = "";
 	// char current_opt_value[256] = {};
 
@@ -181,20 +183,35 @@ int main(int _n_args, char *_list_args[]) {
 					" m -> Music\n"
 					" s -> Music From SoundCloud\n"
 					" v -> Video (Default)\n"
-					" x -> Same as y, but extract to channel folder\n");
+					" x -> Same as y, but extract to channel folder\n"
+					"*c -> Use cookies.txt for downloading (Only for youtube)\n"
+				);
 			// getline(cin, input);
 			download_type = getchar();
+			use_cookies	  = getchar();
 		}
 	}
 
 	logURL(CURRENT_DIRECTORY, download_url, download_type);
 	bool success_dl_file = false;
+	bool download_using_cookies = false;
 
 	do {
+		switch (use_cookies) {
+			case 'c': {
+				printf("Using cookies.txt for downloading\n");
+				download_using_cookies = true;
+				break;
+			}
+			default: {
+				printf("Not using cookies for downloading\n");
+				break;
+			}
+		}
 		switch (download_type) {
 			case 'y': {
 				printf("Downloading as High Quality Youtube video\n");
-				dlVideo(download_url, FILTER_Y);
+				dlVideo(download_url, FILTER_Y, download_using_cookies);
 				success_dl_file = true;
 				break;
 			}
@@ -203,19 +220,19 @@ int main(int _n_args, char *_list_args[]) {
 			case '\r':
 			case 'v': {
 				printf("Downloading as Video\n");
-				dlVideo(download_url, FILTER_V);
+				dlVideo(download_url, FILTER_V, download_using_cookies);
 				success_dl_file = true;
 				break;
 			}
 			case 's': {
 				printf("Downloading as Music From SoundCloud\n");
-				dlVideo(download_url, FILTER_SOUNDCLOUD);
+				dlVideo(download_url, FILTER_SOUNDCLOUD, download_using_cookies);
 				success_dl_file = true;
 				break;
 			}
 			case 'm': {
 				printf("Downloading as Music\n");
-				dlVideo(download_url, FILTER_M);
+				dlVideo(download_url, FILTER_M, download_using_cookies);
 				success_dl_file = true;
 				break;
 			}
@@ -223,7 +240,7 @@ int main(int _n_args, char *_list_args[]) {
 				printf(
 						"Downloading as High Quality Youtube video, then extract to "
 						"channel's folder\n");
-				dlVideo(download_url, FILTER_X);
+				dlVideo(download_url, FILTER_X, download_using_cookies);
 				success_dl_file = true;
 				break;
 			}
